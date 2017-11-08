@@ -1,0 +1,1 @@
+place here some static html content that may communicate with your backend service

@@ -1,0 +1,52 @@
+version: '3.4'
+services:
+  nginx:
+    container_name: anginx
+    image: nginx
+    restart: always
+    ports:
+    - 80:80
+    - 443:443
+    volumes:
+    - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    - ./nginx/certificates:/etc/nginx/certificates
+    - ./nginx/mystaticwebpages/src:/webstatic/portal
+    networks:
+    - front
+  
+  mysql-portal:
+    container_name: amysql
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: db`user
+      MYSQL_PASSWORD: 12345
+      MYSQL_ROOT_HOST: "%"
+    ports:
+    -  "3306:3306"
+    volumes:
+    -  ./mysql/data:/var/lib/mysql
+    restart: always
+    networks:
+    -  back
+
+  jetty:
+    container_name: ajetty
+    image: jetty
+    ports:
+    - "8080:8080" 
+    volumes:
+    - ./jetty/webapps:/var/lib/jetty/webapps
+    - ./jetty/wars/:/var/lib/jetty/wars/
+    - ./jetty/etc/:/var/lib/jetty/etc/
+    - ./jetty/home/jetty/:/home/jetty/
+    networks:
+    - front
+    - back
+    depends_on:
+    -  mysql-portal
+ 
+networks:
+  front:
+  back:
